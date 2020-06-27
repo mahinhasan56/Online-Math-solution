@@ -1,0 +1,51 @@
+<html>
+<title>my inverse</title>
+<head>
+<script>
+Matrix.prototype.inverse = function () {
+    if( !this.isSquare() ) {
+        throw new MatrixError( MatrixError.ErrorCodes.DIMENSION_MISMATCH, 'Matrix must be square' );
+    }
+
+    var M = this.augment( Matrix.eye( this.rows() ) ),
+        row, row_before, new_row, i, j, k, factor, rows, columns;
+
+    try {
+        M = M.decomposeLU();
+        rows = M.rows();
+        columns = M.columns();
+
+        for( i = rows; i > 1; i-- ) {
+            row_before = M.__getRow( i - 1 );
+            row = M.__getRow( i );
+            factor = row_before[i - 1] / row[i - 1];
+
+            new_row = [];
+            for( k = 0; k < columns; k++ ) {
+                new_row[k] = row_before[k] - row[k] * factor;
+            }
+            M.__setRow( i - 1, new_row );
+        }
+
+        for( j = 1; j <= rows; j++ ) {
+            row = M.__getRow( j );
+            new_row = [];
+
+            for( k = 0; k < columns; k++ ) {
+                new_row[k] = row[k] / row[j - 1];
+            }
+
+            M.__setRow( j, new_row );
+        }
+    } catch( e ) {
+        throw new MatrixError( MatrixError.ErrorCodes.MATRIX_IS_SINGULAR );
+    }
+
+    return M.submatrix( 1, rows, this.columns() + 1, columns );
+};
+</script>
+</head>
+<body>
+var person = prompt("Please enter your matrix");
+</body>
+</html>
